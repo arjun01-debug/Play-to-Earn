@@ -1,0 +1,96 @@
+pragma solidity ^0.8.0;
+
+//Contract for our own tokens
+contract MyToken{
+    
+    string public constant name = "FilCoin";
+    string public constant symbol = "FIL";
+    uint public constant decimal = 18;
+    uint public total_tokens = 0;
+    address public admin;
+
+    mapping(address => uint) balance;
+    mapping(address => uint) badges;
+
+    //the constructor will provide 20 tokens to the very first user
+    constructor() {
+        admin = msg.sender;
+        balance[msg.sender] = 20;
+        total_tokens += 20;
+    }
+
+    //function that provides the total number of coins flowing in our blockchain
+    function total_tokens_available() public view returns(uint){
+        return total_tokens;
+    }
+
+    //function that provides the total number coins available with a particular address
+    function balanceOf(address token_owner) public view returns(uint){
+        return balance[token_owner];
+    }
+
+    //function to transfer tokens from one address to other address
+    function transfer(address receiver, uint amount) public returns(bool){
+        require(balance[msg.sender]>=amount);
+        balance[msg.sender] -=amount;
+        balance[receiver] += amount;
+
+        if(balance[msg.sender]<50){
+            badges[msg.sender] = 0;
+        }
+        else if(balance[msg.sender]>=50 && balance[msg.sender]<70){
+            badges[msg.sender] = 1;
+        }
+        else if(balance[msg.sender]>=70 && balance[msg.sender]<100){
+            badges[msg.sender] = 2;
+        }
+        else if(balance[msg.sender]>=100){
+            badges[msg.sender] = 3;
+        }
+
+        if(balance[receiver]>=50 && balance[receiver]<70){
+            badges[receiver] = 1;
+        }
+        else if(balance[receiver]>=70 && balance[receiver]<100){
+            badges[receiver] = 2;
+        }
+        else if(balance[receiver]>=100){
+            badges[receiver] = 3;
+        }
+        return true;
+    }
+
+    //function that will provide tokens to the user after the successful submission of the tasks on sharepoint
+    //we will provide index to every tasks, for example attending a webinar will be equal to 1
+    function task_completed(uint val) public returns(bool){
+        if(val==1){
+            balance[msg.sender] += 20;
+            total_tokens += 20;
+        }
+        else if(val==2){
+            balance[msg.sender] += 30;
+            total_tokens += 30;
+        }
+        else if(val==3){
+            balance[msg.sender] += 10;
+            total_tokens += 10;
+        }
+
+        if(balance[msg.sender]>=50 && balance[msg.sender]<70){
+            badges[msg.sender] = 1;
+        }
+        else if(balance[msg.sender]>=70 && balance[msg.sender]<100){
+            badges[msg.sender] = 2;
+        }
+        else if(balance[msg.sender]>=100){
+            badges[msg.sender] = 3;
+        }
+        return true;
+    }
+
+    //function that will provide the number of available badges of the particular user
+    function badges_available(address owner) public view returns(uint){
+        return badges[owner];
+    }
+
+}
